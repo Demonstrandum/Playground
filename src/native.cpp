@@ -1,4 +1,4 @@
-#include "native.hpp"
+#include "native.h"
 
 #ifdef KERNEL_WIN32
 	#define GLFW_EXPOSE_NATIVE_WIN32
@@ -26,8 +26,8 @@ namespace native {
 	u0 *windowHandle(GLFWwindow *window)
 	{
 		u0 *handle = nullptr;
-		int platform = glfwGetPlatform();
 #ifdef KENREL_LINUX
+		int platform = glfwGetPlatform();
 		if (platform == GLFW_PLATFORM_X11)
 			handle = glfwGetX11Window(window);
 		else
@@ -35,8 +35,9 @@ namespace native {
 #else
 		handle = _GET_WINDOW(window);
 #endif
-		if (platform == GLFW_PLATFORM_COCOA)
-			handle = metalLayer(handle);
+#ifdef KERNEL_DARWIN
+		handle = metalLayer(handle);
+#endif
 		return handle;
 	}
 }

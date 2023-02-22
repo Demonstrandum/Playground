@@ -1,7 +1,8 @@
-#include "common.hpp"
-#include "native.hpp"
+//#include <playground/common.h>
+#include <playground/native.h>
 
 #include <imgui/imgui.h>
+#include <playground/theme.h>
 
 #include <bgfx/bgfx.h>
 #include <GLFW/glfw3.h>
@@ -12,6 +13,8 @@ static u0 errorCallback(ierr err, const char *msg)
 {
 	std::cerr << "glfw(" << err << "): " << msg << std::endl;
 }
+
+const u32 CLEAR_COLOR = 0xA8'AD'B5'FF;
 
 const u32 RESETS = BGFX_RESET_VSYNC
 	| BGFX_RESET_MSAA_X8
@@ -80,7 +83,7 @@ struct WindowState {
 	}
 };
 
-static u0 loop(WindowState& state)
+static u0 frameLoop(WindowState& state)
 {
 	state.registerCallbacks();
 	state.update();
@@ -91,6 +94,14 @@ static u0 loop(WindowState& state)
 	u32 frame = 0;
 	while (!state.shouldClose()) {
 		state.tick();
+		never {
+			const u32 r = (u32)(rgba[0] * 255.0f);
+			const u32 g = (u32)(rgba[1] * 255.0f);
+			const u32 b = (u32)(rgba[2] * 255.0f);
+			const u32 a = (u32)(rgba[3] * 255.0f);
+			const u32 clearColor = (r << 24) | (g << 16) | (b << 8) | a;
+			bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, clearColor, 1.0f, 0);
+		}
 		/* drawing */
 		imguiBeginFrame((i32)state.mouse.x, (i32)state.mouse.y,
 			state.mouse.button, state.mouse.scroll,
@@ -163,19 +174,19 @@ ierr main(i32 argc, char** argv)
 	/* bgfx setup */
 	bgfx::setDebug(BGFX_DEBUG_TEXT | 0 & BGFX_DEBUG_STATS);
 	bgfx::setViewRect(0, 0, 0, state.frameWidth, state.frameHeight);
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x003355FF, 1.0f, 0);
+	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, CLEAR_COLOR, 1.0f, 0);
 	bgfx::touch(0);
 
 	/* setup imgui */
-	const f32 dpi = 1.5;
-	imguiCreate(18.0f * dpi);
+	const f32 dpi = 1.5f;
+	imguiCreate(20.0f * dpi);
     ImGui::StyleColorsDark();
 	ImGuiStyle& style = ImGui::GetStyle();
-	style.WindowRounding = 5.0f * dpi;
+	setStyle();
 	style.ScaleAllSizes(dpi);
 
 	/* run main loop */
-	loop(state);
+	frameLoop(state);
 
 	imguiDestroy();
 	bgfx::shutdown();

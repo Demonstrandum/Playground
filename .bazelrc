@@ -1,3 +1,0 @@
-build:c++20 --cxxopt=-std=c++20
-build:c++20 --cxxopt=-stdlib=libc++
-

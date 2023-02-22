@@ -36,10 +36,6 @@ cc_library(
 			"//conditions:default": [],
 		})
 		+ glob([
-			#"src/**/*.h",
-			#"src/**/*.inl",
-			#"3rdparty/**/*.h",
-			#"3rdparty/**/*.inl",
 			"examples/common/bgfx_utils.cpp",
 			"examples/common/imgui/*.cpp",
 			"3rdparty/dear-imgui/*.cpp",

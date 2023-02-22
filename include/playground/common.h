@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef PLAYGROUND_SRC
 	#error "Missing define(s): PLAYGROUND_SRC"
 #endif
@@ -8,6 +10,10 @@
 
 #define OK (EXIT_SUCCESS);
 #define FAIL (EXIT_FAILURE);
+
+#define never if (0)
+#define until(...) while (!(__VA_ARGS__))
+#define loop while (true)
 
 using ierr = int;
 using umin = unsigned char;

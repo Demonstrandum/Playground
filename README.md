@@ -19,8 +19,8 @@ Bazel takes care of cloning and building (see `WORKSPACE` and `bgfx.BUILD` (&c.)
 ```sh
 # build with
 bazel build //src:playground
-# or run immediately
-bazel run //src:playground
+# or run example immediately
+bazel run //:playground-example
 ```
 
 ![screenshot](https://user-images.githubusercontent.com/26842759/219747206-cf1154bc-2525-41c1-9764-06699d22cb84.png)
