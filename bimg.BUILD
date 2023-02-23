@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@//:configuration.bzl", "COPT_CXX")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -52,7 +53,7 @@ cc_library(
 	]),
 	srcs = glob(["3rdparty/astc-encoder/source/*.cpp"]),
 	includes = ["3rdparty/astc-encoder/include"],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )
 
 cc_library(
@@ -64,7 +65,7 @@ cc_library(
 	],
     includes = ["include"],
 	deps = [":astc-encoder"],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )
 
 cc_library(
@@ -90,5 +91,5 @@ cc_library(
         "@bx//:bx",
     ],
     visibility = ["//visibility:public"],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )

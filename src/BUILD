@@ -1,4 +1,5 @@
 package(default_visibility = ["//visibility:public"])
+load("@//:configuration.bzl", "COPT_CXX")
 
 objc_library(
 	name = "objc-src",
@@ -32,5 +33,5 @@ cc_library(
 		"@bazel_tools//src/conditions:darwin": [":objc-src"],
 		"//conditions:default": [],
 	}),
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )

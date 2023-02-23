@@ -1,2 +1,5 @@
 bazel-*
 .DS*
+.vs/
+*.db
+*.ini

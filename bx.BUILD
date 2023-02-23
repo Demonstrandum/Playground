@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@//:configuration.bzl", "COPT_CXX")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -36,11 +37,14 @@ cc_library(
         "3rdparty",
         "include",
     ] + select({
-		"@bazel_tools//src/conditions:darwin": ["include/compat/osx"],
+		"@bazel_tools//src/conditions:darwin":  ["include/compat/osx"],
+		"@bazel_tools//src/conditions:windows": ["include/compat/msvc"],
+		"@bazel_tools//src/conditions:linux":   ["include/compat/linux"],
+		"@bazel_tools//src/conditions:freebsd": ["include/compat/freebsd"],
 		"//conditions:default": [],
 	}),
-	defines = ["BX_CONFIG_DEBUG"],
+	defines = ["BX_CONFIG_DEBUG", "__STDC_FORMAT_MACROS"],
     deps = [],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )
 

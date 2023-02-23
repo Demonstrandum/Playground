@@ -1,7 +1,9 @@
+load("@//:configuration.bzl", "COPT_CXX")
+
 cc_binary(
 	name = "playground-example",
 	srcs = ["example.cpp"],
 	includes = ["include"],
 	deps = ["//src:playground"],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )

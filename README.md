@@ -23,4 +23,21 @@ bazel build //src:playground
 bazel run //:playground-example
 ```
 
+### Notes
+
+Install Bazel, see [bazel.build/install](https://bazel.build/install).
+
+- On Windows you will need to Visual Studio or at least Windows {10,11} SDK to use the MSVC compiler. After Bazel is installed (recommend through Chocolatey), you need to modify your users environment variables to have `BAZEL_VC` point to your `VC` folder conatining your compiler.
+
+
 ![screenshot](https://user-images.githubusercontent.com/26842759/219747206-cf1154bc-2525-41c1-9764-06699d22cb84.png)
+
+## TODO
+- [x] macOS working
+- [x] Windows working
+- [ ] Linux working
+- [ ] *BSD working
+- [x] macOS native window customisation
+- [ ] Windows native window customisation
+- [ ] Linux Qt/Gtk native window customisation
+

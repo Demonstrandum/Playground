@@ -34,7 +34,8 @@ WIN32_DEFINES = [
 WIN32_HDRS = [
     "src/win32_joystick.h",
     "src/win32_platform.h",
-    "src/wgl_context.h",
+    "src/win32_time.h",
+    "src/win32_thread.h",
 ]
 
 WIN32_SRCS = [

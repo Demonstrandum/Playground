@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "objc_library")
+load("@//:configuration.bzl", "COPT_CXX")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -57,11 +58,14 @@ cc_library(
         "3rdparty/khronos",
 		"examples/common",
         "include",
-    ],
+    ] + select({
+		"@bazel_tools//src/conditions:windows": ["3rdparty/directx-headers/include/directx"],
+		"//conditions:default": [],
+	}),
     deps = [
 		"@bimg//:bimg",
     ],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 )
 
 objc_library(
@@ -85,10 +89,7 @@ objc_library(
 		"IOKit",
 		"QuartzCore",
 	],
-    copts = [
-        "-fno-objc-arc",
-		"-std=c++20",
-    ],
+    copts = COPT_CXX + ["-fno-objc-arc"],
     deps = [
         ":bgfx_src",
     ],
@@ -106,7 +107,7 @@ cc_library(
         "include",
     ],
     visibility = ["//visibility:public"],
-	copts = ["-std=c++20"],
+	copts = COPT_CXX,
 	deps = select({
 		"@bazel_tools//src/conditions:darwin": [":bgfx_objc"],
 		"//conditions:default": [":bgfx_src"],
