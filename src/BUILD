@@ -9,8 +9,6 @@ objc_library(
 	copts = ["-fno-objc-arc"],
 )
 
-print("//include:headers")
-
 cc_library(
 	name = "playground",
 	srcs = [

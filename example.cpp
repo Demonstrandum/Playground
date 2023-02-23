@@ -66,9 +66,9 @@ struct WindowState {
 			u32 r = IMGUI_MBUT_RIGHT;
 			u32 bstate = 0;
 			if (action == GLFW_RELEASE) switch (button) {
-				case GLFW_MOUSE_BUTTON_LEFT:   { bstate &= !l; } break;
-				case GLFW_MOUSE_BUTTON_MIDDLE: { bstate &= !m; } break;
-				case GLFW_MOUSE_BUTTON_RIGHT:  { bstate &= !r; } break;
+				case GLFW_MOUSE_BUTTON_LEFT:   { bstate &= ~l; } break;
+				case GLFW_MOUSE_BUTTON_MIDDLE: { bstate &= ~m; } break;
+				case GLFW_MOUSE_BUTTON_RIGHT:  { bstate &= ~r; } break;
 			} else switch (button) {
 				case GLFW_MOUSE_BUTTON_LEFT:   { bstate |= l; } break;
 				case GLFW_MOUSE_BUTTON_MIDDLE: { bstate |= m; } break;
@@ -172,7 +172,7 @@ ierr main(i32 argc, char** argv)
 	bgfx::init(init);
 
 	/* bgfx setup */
-	bgfx::setDebug(BGFX_DEBUG_TEXT | 0 & BGFX_DEBUG_STATS);
+	bgfx::setDebug(BGFX_DEBUG_TEXT);
 	bgfx::setViewRect(0, 0, 0, state.frameWidth, state.frameHeight);
 	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, CLEAR_COLOR, 1.0f, 0);
 	bgfx::touch(0);
