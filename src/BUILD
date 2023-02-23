@@ -14,11 +14,11 @@ cc_library(
 	srcs = [
 		"native.cpp"
 	],
-	hdrs = ["//include:headers"] + glob([
+	hdrs = ["@//include:headers"] + glob([
 		'*.hpp', '*.h',
 	]),
 	strip_include_prefix = "/include/playground",
-	#includes = ["//:include/folder"],
+	includes = ["@//include:folder"],
 	defines = ["PLAYGROUND_SRC"] + select({
 		"@bazel_tools//src/conditions:windows": ["KERNEL_WIN32"],
 		"@bazel_tools//src/conditions:linux":   ["KERNEL_LINUX"],
