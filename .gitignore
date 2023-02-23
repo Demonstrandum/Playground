@@ -3,3 +3,4 @@ bazel-*
 .vs/
 *.db
 *.ini
+*.log
