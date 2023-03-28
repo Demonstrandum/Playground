@@ -26,5 +26,7 @@ new_git_repository(
     name = "bgfx",
     remote = "https://github.com/bkaradzic/bgfx.git",
     commit = "b0bb4fc578cf1e9e6f446ee0c718a2305846b207", # Mar 18
+    patch_args = ["-p1"],
+    patches = ["@//:bgfx-egl-support.patch"],
     build_file = "@//:bgfx.BUILD",
 )
