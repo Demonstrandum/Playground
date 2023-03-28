@@ -32,48 +32,60 @@ srcs = [
 cc_library(
     name = "bgfx_src",
     srcs = srcs
-		+ select({
-			"@bazel_tools//src/conditions:linux": ["src/glcontext_glx.cpp"],
-			"//conditions:default": [],
-		})
-		+ glob([
-			"examples/common/bgfx_utils.cpp",
-			"examples/common/imgui/*.cpp",
-			"3rdparty/dear-imgui/*.cpp",
-			"3rdparty/meshoptimizer/src/*.cpp",
-		]),
+        + select({
+            "@bazel_tools//src/conditions:linux": ["src/glcontext_glx.cpp"],
+            "//conditions:default": [],
+        })
+        + glob([
+            "examples/common/bgfx_utils.cpp",
+            "examples/common/imgui/*.cpp",
+            "3rdparty/dear-imgui/*.cpp",
+            "3rdparty/meshoptimizer/src/*.cpp",
+        ]),
     hdrs = glob([
         "**/*.h",
         "**/*.inl",
     ]),
     defines = select({
-		"@bazel_tools//src/conditions:darwin": [
-			"BGFX_CONFIG_RENDERER_VULKAN=0",
-			"BGFX_CONFIG_RENDERER_METAL=1",
-		],
-		"//conditions:default": [],
-	}),
+        "@bazel_tools//src/conditions:darwin": [
+            "BGFX_CONFIG_RENDERER_VULKAN=0",
+            "BGFX_CONFIG_RENDERER_METAL=1",
+        ],
+        "@bazel_tools//src/conditions:linux": [
+            "BGFX_CONFIG_RENDERER_OPENGL=0",
+            "BGFX_CONFIG_RENDERER_OPENGLES=20",
+        ],
+        "//conditions:default": [],
+    }),
     includes = [
         "3rdparty",
         "3rdparty/khronos",
-		"examples/common",
+        "examples/common",
         "include",
     ] + select({
-		"@bazel_tools//src/conditions:windows": ["3rdparty/directx-headers/include/directx"],
-		"//conditions:default": [],
-	}),
+        "@bazel_tools//src/conditions:windows": ["3rdparty/directx-headers/include/directx"],
+        "@bazel_tools//src/conditions:linux": [
+            "3rdparty/directx-headers/include/directx",
+            "3rdparty/directx-headers/include/wsl/stubs",
+        ],
+        "//conditions:default": [],
+    }),
     deps = [
-		"@bimg//:bimg",
+        "@bimg//:bimg",
     ],
-	copts = COPT_CXX,
+    linkopts = select({
+        "@bazel_tools//src/conditions:linux": ['-lX11', '-lEGL', '-lGL', '-pthread'],
+        "//conditions:default": [],
+    }),
+    copts = COPT_CXX,
 )
 
 objc_library(
     name = "bgfx_objc",
     srcs = [
-		"src/glcontext_eagl.mm",
-		"src/glcontext_nsgl.mm",
-		"src/renderer_mtl.mm",
+        "src/glcontext_eagl.mm",
+        "src/glcontext_nsgl.mm",
+        "src/renderer_mtl.mm",
     ],
     hdrs = glob([
         "**/*.h",
@@ -81,14 +93,14 @@ objc_library(
     ]),
     defines = [],
     includes = ["include"],
-	enable_modules = True,
-	sdk_frameworks = [
-		"Foundation",
-		"Metal",
-		"AppKit",
-		"IOKit",
-		"QuartzCore",
-	],
+    enable_modules = True,
+    sdk_frameworks = [
+        "Foundation",
+        "Metal",
+        "AppKit",
+        "IOKit",
+        "QuartzCore",
+    ],
     copts = COPT_CXX + ["-fno-objc-arc"],
     deps = [
         ":bgfx_src",
@@ -96,20 +108,20 @@ objc_library(
 )
 
 cc_library(
-	name = "bgfx",
-	hdrs = glob([
-		"**/*.h",
-		"**/*.inl",
+    name = "bgfx",
+    hdrs = glob([
+        "**/*.h",
+        "**/*.inl",
     ]),
-	includes = [
+    includes = [
         "3rdparty",
         "3rdparty/khronos",
         "include",
     ],
     visibility = ["//visibility:public"],
-	copts = COPT_CXX,
-	deps = select({
-		"@bazel_tools//src/conditions:darwin": [":bgfx_objc"],
-		"//conditions:default": [":bgfx_src"],
-	}),
+    copts = COPT_CXX,
+    deps = select({
+        "@bazel_tools//src/conditions:darwin": [":bgfx_objc"],
+        "//conditions:default": [":bgfx_src"],
+    }),
 )

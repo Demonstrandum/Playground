@@ -22,50 +22,50 @@ srcs = [
 ]
 
 cc_library(
-	name = "iqa",
-	srcs = glob([
-		"3rdparty/iqa/include/*.h",
-		"3rdparty/iqa/source/*.c",
-	]),
-	hdrs = glob([
-		"3rdparty/iqa/include/*.h",
-	]),
-	includes = ["3rdparty/iqa/include"],
+    name = "iqa",
+    srcs = glob([
+        "3rdparty/iqa/include/*.h",
+        "3rdparty/iqa/source/*.c",
+    ]),
+    hdrs = glob([
+        "3rdparty/iqa/include/*.h",
+    ]),
+    includes = ["3rdparty/iqa/include"],
 )
 
 cc_library(
-	name = "tinyexr",
-	srcs = glob([
-		"3rdparty/tinyexr/deps/**/*.c",
-		"3rdparty/tinyexr/*.h",
-	]),
-	hdrs = glob([
-		"3rdparty/tinyexr/*.h",
-		"3rdparty/tinyexr/deps/**/*.h",
-	]),
+    name = "tinyexr",
+    srcs = glob([
+        "3rdparty/tinyexr/deps/**/*.c",
+        "3rdparty/tinyexr/*.h",
+    ]),
+    hdrs = glob([
+        "3rdparty/tinyexr/*.h",
+        "3rdparty/tinyexr/deps/**/*.h",
+    ]),
 )
 
 cc_library(
-	name = "astc-encoder",
-	hdrs = glob([
-		"3rdparty/astc-encoder/source/*.h",
-		"3rdparty/astc-encoder/include/*.h",
-	]),
-	srcs = glob(["3rdparty/astc-encoder/source/*.cpp"]),
-	includes = ["3rdparty/astc-encoder/include"],
-	copts = COPT_CXX,
+    name = "astc-encoder",
+    hdrs = glob([
+        "3rdparty/astc-encoder/source/*.h",
+        "3rdparty/astc-encoder/include/*.h",
+    ]),
+    srcs = glob(["3rdparty/astc-encoder/source/*.cpp"]),
+    includes = ["3rdparty/astc-encoder/include"],
+    copts = COPT_CXX,
 )
 
 cc_library(
     name = "astc-codec",
     hdrs = [
-		"include/bimg/bimg.h",
-		"include/bimg/decode.h",
-		"include/bimg/encode.h",
-	],
+        "include/bimg/bimg.h",
+        "include/bimg/decode.h",
+        "include/bimg/encode.h",
+    ],
     includes = ["include"],
-	deps = [":astc-encoder"],
-	copts = COPT_CXX,
+    deps = [":astc-encoder"],
+    copts = COPT_CXX,
 )
 
 cc_library(
@@ -75,7 +75,7 @@ cc_library(
         "**/*.h",
         "src/bimg_p.*",
         "3rdparty/lodepng/*.cpp",
-		"3rdparty/tinyexr/deps/miniz/*.h",
+        "3rdparty/tinyexr/deps/miniz/*.h",
     ]),
     includes = [
         "3rdparty",
@@ -85,11 +85,11 @@ cc_library(
         "include",
     ],
     deps = [
-		":iqa",
-		":tinyexr",
+        ":iqa",
+        ":tinyexr",
         ":astc-codec",
         "@bx//:bx",
     ],
     visibility = ["//visibility:public"],
-	copts = COPT_CXX,
+    copts = COPT_CXX,
 )

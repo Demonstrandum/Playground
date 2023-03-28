@@ -1,12 +1,13 @@
 #pragma once
 
 #ifndef PLAYGROUND_SRC
-	#error "Missing define(s): PLAYGROUND_SRC"
+    #error "Missing define(s): PLAYGROUND_SRC"
 #endif
 
 #include <cstdlib>
 #include <cstddef>
 #include <cstdint>
+#include <cassert>
 
 #define OK (EXIT_SUCCESS);
 #define FAIL (EXIT_FAILURE);

@@ -35,9 +35,10 @@ Install Bazel, see [bazel.build/install](https://bazel.build/install).
 
 ## TODO
 
-- [x] macOS working (checked on `arm/aarch64`)
-- [x] Windows working (checked on `arm/aarch64`)
-- [ ] Linux working (not checked)
+- [x] macOS working (checked on `arm/aarch64`: Ventura)
+- [x] Windows working (checked on `arm/aarch64`: Windows 11)
+- [x] Linux working (checked on `arm/aarch64`: Asahi Linux X11/Wayland)
+- [ ] Wayland has serious fractional scaling issues and no support for GNOME native window decoration. Upstream problems.
 - [ ] *BSD working (not checked)
 - [x] macOS native window customisation
 - [ ] Windows native window customisation
