@@ -1,14 +1,14 @@
 filegroup(
-	name = "folder",
-	srcs = ["."],
+    name = "folder",
+    srcs = ["."],
     visibility = ["//visibility:public"],
 )
 
 filegroup(
-	name = "headers",
-	srcs = glob([
-		"playground/*.h",
-		"playground/*.inl",
-	]),
+    name = "headers",
+    srcs = glob([
+        "playground/*.h",
+        "playground/*.inl",
+    ]),
     visibility = ["//visibility:public"],
 )

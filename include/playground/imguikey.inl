@@ -7,45 +7,45 @@
 
 const byte char_names[] = "`-=[]\\,;\'./";
 const ifast char_keys[] = {
-	GLFW_KEY_GRAVE_ACCENT, GLFW_KEY_MINUS, GLFW_KEY_EQUAL,
-	GLFW_KEY_LEFT_BRACKET, GLFW_KEY_RIGHT_BRACKET, GLFW_KEY_BACKSLASH,
-	GLFW_KEY_COMMA, GLFW_KEY_SEMICOLON, GLFW_KEY_APOSTROPHE,
-	GLFW_KEY_PERIOD, GLFW_KEY_SLASH, 0
+    GLFW_KEY_GRAVE_ACCENT, GLFW_KEY_MINUS, GLFW_KEY_EQUAL,
+    GLFW_KEY_LEFT_BRACKET, GLFW_KEY_RIGHT_BRACKET, GLFW_KEY_BACKSLASH,
+    GLFW_KEY_COMMA, GLFW_KEY_SEMICOLON, GLFW_KEY_APOSTROPHE,
+    GLFW_KEY_PERIOD, GLFW_KEY_SLASH, 0
 };
 
 static ifast translateUntranslatedKey(ifast key, ifast scancode)
 {
 #if GLFW_HAS_GETKEYNAME && !defined(__EMSCRIPTEN__)
-	if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_EQUAL)
+    if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_EQUAL)
         return key;
-	const byte* key_name = glfwGetKeyName(key, scancode);
-	if (key_name && key_name[0] != 0 && key_name[1] == 0) {
-		if (key_name[0] >= '0' && key_name[0] <= '9')               { key = GLFW_KEY_0 + (key_name[0] - '0'); }
-		else if (key_name[0] >= 'A' && key_name[0] <= 'Z')          { key = GLFW_KEY_A + (key_name[0] - 'A'); }
-		else if (key_name[0] >= 'a' && key_name[0] <= 'z')          { key = GLFW_KEY_A + (key_name[0] - 'a'); }
-		else if (const char* p = strchr(char_names, key_name[0]))   { key = char_keys[p - char_names]; }
-	}
+    const byte* key_name = glfwGetKeyName(key, scancode);
+    if (key_name && key_name[0] != 0 && key_name[1] == 0) {
+        if (key_name[0] >= '0' && key_name[0] <= '9')               { key = GLFW_KEY_0 + (key_name[0] - '0'); }
+        else if (key_name[0] >= 'A' && key_name[0] <= 'Z')          { key = GLFW_KEY_A + (key_name[0] - 'A'); }
+        else if (key_name[0] >= 'a' && key_name[0] <= 'z')          { key = GLFW_KEY_A + (key_name[0] - 'a'); }
+        else if (const char* p = strchr(char_names, key_name[0]))   { key = char_keys[p - char_names]; }
+    }
 #else
-	IM_UNUSED(scancode);
+    IM_UNUSED(scancode);
 #endif
-	return key;
+    return key;
 }
 
 static u0 updateKeyModifiers(GLFWwindow *w)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	io.AddKeyEvent(ImGuiMod_Ctrl,
-		   (glfwGetKey(w, GLFW_KEY_LEFT_CONTROL)  == GLFW_PRESS)
-		|| (glfwGetKey(w, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS));
-	io.AddKeyEvent(ImGuiMod_Shift,
-		   (glfwGetKey(w, GLFW_KEY_LEFT_SHIFT)    == GLFW_PRESS)
-		|| (glfwGetKey(w, GLFW_KEY_RIGHT_SHIFT)   == GLFW_PRESS));
-	io.AddKeyEvent(ImGuiMod_Alt,
-		   (glfwGetKey(w, GLFW_KEY_LEFT_ALT)      == GLFW_PRESS)
-		|| (glfwGetKey(w, GLFW_KEY_RIGHT_ALT)     == GLFW_PRESS));
-	io.AddKeyEvent(ImGuiMod_Super,
-		   (glfwGetKey(w, GLFW_KEY_LEFT_SUPER)    == GLFW_PRESS)
-		|| (glfwGetKey(w, GLFW_KEY_RIGHT_SUPER)   == GLFW_PRESS));
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddKeyEvent(ImGuiMod_Ctrl,
+           (glfwGetKey(w, GLFW_KEY_LEFT_CONTROL)  == GLFW_PRESS)
+        || (glfwGetKey(w, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS));
+    io.AddKeyEvent(ImGuiMod_Shift,
+           (glfwGetKey(w, GLFW_KEY_LEFT_SHIFT)    == GLFW_PRESS)
+        || (glfwGetKey(w, GLFW_KEY_RIGHT_SHIFT)   == GLFW_PRESS));
+    io.AddKeyEvent(ImGuiMod_Alt,
+           (glfwGetKey(w, GLFW_KEY_LEFT_ALT)      == GLFW_PRESS)
+        || (glfwGetKey(w, GLFW_KEY_RIGHT_ALT)     == GLFW_PRESS));
+    io.AddKeyEvent(ImGuiMod_Super,
+           (glfwGetKey(w, GLFW_KEY_LEFT_SUPER)    == GLFW_PRESS)
+        || (glfwGetKey(w, GLFW_KEY_RIGHT_SUPER)   == GLFW_PRESS));
 }
 
 static ImGuiKey toImGuiKey(ifast key)
