@@ -6,6 +6,9 @@ filegroup(
 
 filegroup(
 	name = "headers",
-	srcs = glob(["playground/*.h"]),
+	srcs = glob([
+		"playground/*.h",
+		"playground/*.inl",
+	]),
     visibility = ["//visibility:public"],
 )

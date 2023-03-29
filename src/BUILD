@@ -11,11 +11,9 @@ objc_library(
 
 cc_library(
 	name = "playground",
-	srcs = [
-		"native.cpp"
-	],
+	srcs = glob(["*.cpp"]),
 	hdrs = ["@//include:headers"] + glob([
-		'*.hpp', '*.h',
+		'*.hpp', '*.h', '*.inl',
 	]),
 	strip_include_prefix = "/include/playground",
 	includes = ["@//include:folder"],
@@ -27,6 +25,8 @@ cc_library(
 	deps = [
 		"@glfw//:glfw",
 		"@bgfx//:bgfx",
+		"@linalg//:linalg",
+		"@freetype2//:freetype",
 	] + select({
 		"@bazel_tools//src/conditions:darwin": [":objc-src"],
 		"//conditions:default": [],

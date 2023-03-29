@@ -7,6 +7,8 @@ This is a simple starting point for a windowed cross-platform graphical applicat
 - Windowing: GLFW
 - Graphics: BGFX (API over OpenGL, DirectX, Vulkan, Metal, &c.)
 - Debug GUI: ImGui
+- Linear algebra library: `linalg.h`
+- Text rendering: FreeType2
 
 See `example.cpp` for short example usage.
 
@@ -27,7 +29,7 @@ bazel run //:playground-example
 
 Install Bazel, see [bazel.build/install](https://bazel.build/install).
 
-- On Windows you will need to Visual Studio (yup.) or at least the Windows {10,11} SDK to use the MSVC compiler. After Bazel is installed (recommend through Chocolatey, `choco install bazel`), you need to modify your users environment variables to have `BAZEL_VC` point to your `VC` folder containing your compiler tools.
+- On Windows you will need to install Visual Studio (the IDE) or at least the Windows {10,11} SDK to use the MSVC compiler. After Bazel is installed (recommend through Chocolatey, `choco install bazel`), you need to modify your users environment variables to have `BAZEL_VC` point to your `VC` folder containing your compiler tools.
 - macOS and *nix environments are more straightforward. Just install Bazel with `brew install bazel` or through your native package manager. Make sure Java version ≥11 is available/default.
 
 ![macos-screenshot](https://user-images.githubusercontent.com/26842759/220960536-9875f36d-09df-491a-bb5c-ed5e35119799.png)

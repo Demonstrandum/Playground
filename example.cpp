@@ -1,8 +1,13 @@
-//#include <playground/common.h>
+#include <playground/common.h>
 #include <playground/native.h>
+#include <playground/text.h>
+
+#include "assets/inter.ttf.h"
 
 #include <imgui/imgui.h>
-#include <playground/theme.h>
+
+#include <playground/theme.inl>
+#include <playground/imguikey.inl>
 
 #include <bgfx/bgfx.h>
 #include <GLFW/glfw3.h>
@@ -21,12 +26,14 @@ const u32 RESETS = BGFX_RESET_VSYNC
 	| BGFX_RESET_HIDPI
 	| BGFX_RESET_HDR10;
 
+const ImGuiWindowFlags IMGUI_WINFLAGS = ImGuiWindowFlags_AlwaysAutoResize;
+
 struct WindowState {
 	GLFWwindow* window;
 	struct {
 		f64 x, y;
 		u16 button;
-		i32 scroll;
+		struct { f64 dx, dy; } scroll;
 	} mouse = { 0 };
 	u32 width = 0, height = 0;
 	u32 frameWidth = 0, frameHeight = 0;
@@ -80,6 +87,21 @@ struct WindowState {
 			that->mouse.x = that->scale * xpos;
 			that->mouse.y = that->scale * ypos;
 		});
+		glfwSetScrollCallback(window, [](GLFWwindow*, f64 xoff, f64 yoff) {
+			that->mouse.scroll.dx += xoff;
+			that->mouse.scroll.dy += yoff;
+		});
+		glfwSetKeyCallback(window, [](GLFWwindow* win, ifast keycode, ifast scancode, ifast state, ifast) {
+			updateKeyModifiers(win);
+			keycode = translateUntranslatedKey(keycode, scancode);
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuiKey key = toImGuiKey(keycode);
+			io.AddKeyEvent(key, state == GLFW_PRESS);
+		});
+		glfwSetCharCallback(window, [](GLFWwindow*, rune codepoint) {
+			ImGuiIO& io = ImGui::GetIO();
+			io.AddInputCharacter(codepoint);
+		});
 	}
 };
 
@@ -90,9 +112,20 @@ static u0 frameLoop(WindowState& state)
 	state.reset();
 
 	f32 rgba[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+	ImVec4* color = (ImVec4 *)&rgba;
+	char inputText[255] = { 0 };
+
+	/* render some text */
+	std::vector<umin> font(inter_ttf, std::end(inter_ttf));
+	text::FontShaper shaper;
+	assert(shaper.m_lib != nullptr);
+	shaper.loadFontFace(font, 36);
+	const rune c_text[] = { 'h', 'i', ' ', 'y', 'o', 'u', '.', 0 };
+	std::vector<rune> text_line(c_text, std::end(c_text));
+	auto tex = shaper.renderText(text_line);
 
 	u32 frame = 0;
-	while (!state.shouldClose()) {
+	until (state.shouldClose()) {
 		state.tick();
 		never {
 			const u32 r = (u32)(rgba[0] * 255.0f);
@@ -104,16 +137,22 @@ static u0 frameLoop(WindowState& state)
 		}
 		/* drawing */
 		imguiBeginFrame((i32)state.mouse.x, (i32)state.mouse.y,
-			state.mouse.button, state.mouse.scroll,
+			state.mouse.button, (i32)state.mouse.scroll.dy,
 			state.frameWidth, state.frameHeight);
 		{
-			ImGui::Begin("Little Guy");
-			ImGui::Button("Hello");
-			ImGui::Text("Hello, World!");
+			ImGui::Begin("What's your name?", nullptr, IMGUI_WINFLAGS);
+			if (ImGui::Button("Clear"))
+				memset(inputText, '\0', sizeof(inputText));
+			if (inputText[0] == '\0')
+				ImGui::Text("Write your name below!");
+			else
+				ImGui::TextColored(*color, "Hello, %s!", inputText);
+			ImGui::InputText("Name", inputText, sizeof(inputText));
 			ImGui::End();
 		}
+		//ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
 		{
-			ImGui::Begin("Sliders");
+			ImGui::Begin("Sliders", nullptr, IMGUI_WINFLAGS);
 			ImGui::Text("Framerate (Hz): %.3f", ImGui::GetIO().Framerate);
 			ImGui::SliderFloat("Red",   &rgba[0], 0.0f, 1.0f);
 			ImGui::SliderFloat("Green", &rgba[1], 0.0f, 1.0f);
@@ -181,8 +220,8 @@ ierr main(i32 argc, char** argv)
 	const f32 dpi = 1.5f;
 	imguiCreate(20.0f * dpi);
     ImGui::StyleColorsDark();
-	ImGuiStyle& style = ImGui::GetStyle();
 	setStyle();
+	ImGuiStyle& style = ImGui::GetStyle();
 	style.ScaleAllSizes(dpi);
 
 	/* run main loop */

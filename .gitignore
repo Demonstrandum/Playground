@@ -1,6 +1,7 @@
 bazel-*
 .DS*
 .vs/
+.vscode/
 *.db
 *.ini
 *.log

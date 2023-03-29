@@ -30,23 +30,39 @@ srcs = [
 ]
 
 cc_library(
+	name = "imgui-headers",
+	hdrs = glob([
+		"3rdparty/dear-imgui/**/*.h",
+	]),
+	includes = ["3rdparty"],
+	strip_include_prefix = "3rdparty/dear-imgui",
+)
+
+cc_library(
+	name = "stb-headers",
+	hdrs = glob([
+		"3rdparty/stb/*.h",
+	]),
+	includes = ["3rdparty"],
+	strip_include_prefix = "3rdparty",
+)
+
+cc_library(
     name = "bgfx_src",
-    srcs = srcs
-		+ select({
-			"@bazel_tools//src/conditions:linux": ["src/glcontext_glx.cpp"],
-			"//conditions:default": [],
-		})
-		+ glob([
-			"examples/common/bgfx_utils.cpp",
-			"examples/common/imgui/*.cpp",
-			"3rdparty/dear-imgui/*.cpp",
-			"3rdparty/meshoptimizer/src/*.cpp",
-		]),
+    srcs = srcs + select({
+		"@bazel_tools//src/conditions:linux": ["src/glcontext_glx.cpp"],
+		"//conditions:default": [],
+	}) + glob([
+		"examples/common/bgfx_utils.cpp",
+		"examples/common/imgui/*.cpp",
+		"3rdparty/dear-imgui/*.cpp",
+		"3rdparty/meshoptimizer/src/*.cpp",
+	]),
     hdrs = glob([
         "**/*.h",
         "**/*.inl",
-    ]),
-    defines = select({
+	]),
+	defines = ["IMGUI_ENABLE_FREETYPE"] + select({
 		"@bazel_tools//src/conditions:darwin": [
 			"BGFX_CONFIG_RENDERER_VULKAN=0",
 			"BGFX_CONFIG_RENDERER_METAL=1",
@@ -63,6 +79,7 @@ cc_library(
 		"//conditions:default": [],
 	}),
     deps = [
+		"@imgui//:freetype",
 		"@bimg//:bimg",
     ],
 	copts = COPT_CXX,

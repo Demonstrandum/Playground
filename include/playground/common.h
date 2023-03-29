@@ -1,5 +1,7 @@
 #pragma once
 
+using double_t = double;
+
 #ifndef PLAYGROUND_SRC
 	#error "Missing define(s): PLAYGROUND_SRC"
 #endif
@@ -33,8 +35,6 @@ using u0 = void;
 
 using i8 = int8_t;
 using u8 = uint8_t;
-using octet = u8;
-using byte = octet;
 
 using i16 = int16_t;
 using u16 = uint16_t;
@@ -48,3 +48,6 @@ using u64 = uint64_t;
 using f32 = float;
 using f64 = double;
 
+using octet = u8;
+using byte = octet;
+using rune = u32;
