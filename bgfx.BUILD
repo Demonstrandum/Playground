@@ -122,7 +122,7 @@ objc_library(
     ],
     copts = COPT_CXX + ["-fno-objc-arc"],
     deps = [
-        ":bgfx_src",
+        "//:bgfx_src",
     ],
 )
 
@@ -140,7 +140,179 @@ cc_library(
     visibility = ["//visibility:public"],
     copts = COPT_CXX,
     deps = select({
-        "@bazel_tools//src/conditions:darwin": [":bgfx_objc"],
-        "//conditions:default": [":bgfx_src"],
+        "@bazel_tools//src/conditions:darwin": ["//:bgfx_objc"],
+        "//conditions:default": ["//:bgfx_src"],
     }),
+)
+
+cc_library(
+    name = "fcpp",
+    srcs = glob(["3rdparty/fcpp/*.c"],
+        exclude = ["**/usecpp.c"],
+    ),
+    hdrs = glob(["3rdparty/fcpp/*.h"]),
+    includes = ["3rdparty/fcpp"],
+)
+
+cc_library(
+    name = "glsl-optimizer",
+    srcs = glob([
+        "3rdparty/glsl-optimizer/src/util/**/*.c*",
+        "3rdparty/glsl-optimizer/src/mesa/**/*.c*",
+        "3rdparty/glsl-optimizer/src/glsl/**/*.c*",
+    ], exclude = [
+        "**/src/glsl/glcpp/glcpp.c",
+        "**/src/glsl/glcpp/tests/**",
+        "**/src/glsl/glcpp/**/*.l",
+        "**/src/glsl/glcpp/**/*.y",
+        "**/src/glsl/ir_set_program_inouts.cpp",
+        "**/src/glsl/main.cpp",
+        "**/src/glsl/builtin_stubs.cpp",
+    ]),
+    hdrs = glob([
+        "3rdparty/glsl-optimizer/src/util/**/*.h*",
+        "3rdparty/glsl-optimizer/src/mesa/**/*.h*",
+        "3rdparty/glsl-optimizer/src/glsl/**/*.h*",
+        "3rdparty/glsl-optimizer/include/**/*.h",
+    ]),
+    includes = [
+        "3rdparty/glsl-optimizer/include",
+        "3rdparty/glsl-optimizer/src/glsl",
+        "3rdparty/glsl-optimizer/src/mesa",
+        "3rdparty/glsl-optimizer/src",
+    ],
+    defines = select({
+        "@bazel_tools//src/conditions:windows_msvc": [
+            "__STDC__",
+            "__STDC_VERSION__=199901L",
+            "strdup=_strdup",
+            "alloca=_alloca",
+            "isascii=__isascii",
+        ],
+        "//conditions:default": [],
+    }),
+    copts = select({
+        "@bazel_tools//src/conditions:windows": [],
+        "//conditions:default": ['-fno-strict-aliasing'],  # unix: has bugs if strict aliasing is used
+    })
+)
+
+cc_library(
+    name = "spirv-headers",
+    hdrs = glob([
+        "3rdparty/spirv-headers/include/**/*.h*",  # .h, .hpp, .hpp11, &c.
+    ]),
+    includes = ["3rdparty/spirv-headers/include"],
+)
+
+cc_library(
+    name = "spirv-tools",
+    srcs = glob(["3rdparty/spirv-tools/source/**/*.cpp"]),
+    hdrs = glob([
+        "3rdparty/spirv-tools/include/**/*.hpp",
+        "3rdparty/spirv-tools/include/**/*.inc",
+        "3rdparty/spirv-tools/include/**/*.h",
+        "3rdparty/spirv-tools/source/**/*.h",
+    ]),
+    includes = [
+        "3rdparty/spirv-tools/include",
+        "3rdparty/spirv-tools/include/generated",
+        "3rdparty/spirv-tools/source",
+        "3rdparty/spirv-tools",
+    ],
+    deps = ["//:spirv-headers"],
+)
+
+cc_library(
+    name = "spirv-cross",
+    srcs = glob(["3rdparty/spirv-cross/*.cpp"]),
+    hdrs = glob([
+        "3rdparty/spirv-cross/**/*.hpp",
+        "3rdparty/spirv-cross/**/*.h",
+    ]),
+    includes = [
+        "3rdparty/spirv-cross/include",
+        "3rdparty/spirv-cross",
+    ],
+)
+
+cc_library(
+    name = "glslang",
+    srcs = glob([
+        "3rdparty/glslang/glslang/**/*.c",
+        "3rdparty/glslang/glslang/**/*.cpp",
+        "3rdparty/glslang/SPIRV/**/*.cpp",
+        "3rdparty/glslang/OGLCompilersDLL/*.cpp",
+        #"3rdparty/glslang/StandAlone/*.cpp",
+    ], exclude = [
+        "**/ossource.cpp",
+    ]) + select({
+        "@bazel_tools//src/conditions:windows": [
+            "3rdparty/glslang/glslang/OSDependent/Windows/ossource.cpp"
+        ],
+        "//conditions:default": [
+            "3rdparty/glslang/glslang/OSDependent/Unix/ossource.cpp"
+        ],
+    }),
+    hdrs = glob([
+        "3rdparty/glslang/*.h",
+        "3rdparty/glslang/glslang/**/*.h",
+        "3rdparty/glslang/glslang/**/*.hpp",
+        "3rdparty/glslang/SPIRV/**/*.hpp",
+        "3rdparty/glslang/SPIRV/**/*.h",
+        "3rdparty/glslang/OGLCompilersDLL/*.h",
+        "3rdparty/glslang/StandAlone/*.h",
+    ]),
+    includes = [
+        "3rdparty/glslang/glslang/Include",
+        "3rdparty/glslang/glslang/Public",
+        "3rdparty/glslang/SPIRV",
+        "3rdparty/glslang",
+        "3rdparty",
+    ],
+    defines = [
+        "ENABLE_OPT=1",
+        "ENABLE_HLSL=1",
+    ],
+    deps = ["//:spirv-tools"],
+)
+
+cc_library(
+    name = "webgpu",
+    srcs = ["3rdparty/webgpu/webgpu_cpp.cpp"],
+    hdrs = glob(["3rdparty/webgpu/include/webgpu/*.h"]),
+    includes = ["3rdparty/webgpu/include"],
+)
+
+cc_library(
+    name = "shaderc_src",
+    srcs = glob(["tools/shaderc/*.cpp"]),
+    hdrs = glob(["tools/shaderc/*.h"]),
+    deps = [
+        "//:bgfx",
+        "//:fcpp",
+        "//:glslang",
+        "//:glsl-optimizer",
+        "//:spirv-cross",
+        "//:webgpu",
+    ],
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": ['-DEFAULTLIB:psapi.lib'],
+        "//conditions:default": ['-lpthread'],  # unix
+    }),
+    copts = COPT_CXX,
+)
+
+# compile bgfx shaders with:
+#   shaderc -f <in.sc> -o <out.*> --type <[v]ertex/[f]ragment/[c]ompute> -i <include-dir>
+# see `shaderc -h` for more options.
+cc_binary(
+    name = "shaderc",
+    deps = ["//:shaderc_src"],
+    copts = COPT_CXX,
+)
+
+filegroup(
+    name = "shader-include",
+    srcs = ["src"],
 )

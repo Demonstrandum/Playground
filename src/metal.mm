@@ -17,7 +17,7 @@ namespace native {
 		NSWindow *window = (NSWindow*)cocoaWindow;
 		window.styleMask |= NSWindowStyleMaskUnifiedTitleAndToolbar
 			| NSWindowStyleMaskFullSizeContentView;
-		window.titlebarAppearsTransparent = NO;
+		window.titlebarAppearsTransparent = YES;
 		//window.titleVisibility = NSWindowTitleHidden;
 		window.backgroundColor = [NSColor blackColor];
 		window.toolbar.visible = YES;

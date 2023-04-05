@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 
-const byte char_names[] = "`-=[]\\,;\'./";
-const ifast char_keys[] = {
+static const byte char_names[] = "`-=[]\\,;\'./";
+static const ifast char_keys[] = {
     GLFW_KEY_GRAVE_ACCENT, GLFW_KEY_MINUS, GLFW_KEY_EQUAL,
     GLFW_KEY_LEFT_BRACKET, GLFW_KEY_RIGHT_BRACKET, GLFW_KEY_BACKSLASH,
     GLFW_KEY_COMMA, GLFW_KEY_SEMICOLON, GLFW_KEY_APOSTROPHE,

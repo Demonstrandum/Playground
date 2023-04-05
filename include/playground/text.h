@@ -4,6 +4,8 @@
 #include "mesh.h"
 
 #include <vector>
+#include <codecvt>
+
 
 #include <bgfx/bgfx.h>
 #include <ft2build.h>
@@ -15,19 +17,27 @@ using mesh::RGBA32;
 using Bitmap = FT_Bitmap;
 
 struct Metrics {
-    u16 bbox_ymax;
     u16 glyph_width;
+    u16 glyph_height;
     u16 advance;
     u16 xoff;
     u16 yoff;
 
     Metrics(FT_Face face) {
-        bbox_ymax = face->bbox.yMax / 64;
         glyph_width = face->glyph->metrics.width / 64;
+        glyph_height = face->glyph->metrics.height / 64;
         advance = face->glyph->metrics.horiAdvance / 64;
         xoff = (advance - glyph_width) / 2;
-        yoff = bbox_ymax - face->glyph->metrics.horiBearingY / 64;
+        yoff = face->glyph->bitmap_top;
     }
+};
+
+/// Blitted texture of text on the same line.
+struct TextTexture {
+    u16 rectWidth;
+    u16 rectHeight;
+    f32 rectAspect;
+    bgfx::TextureHandle handle;
 };
 
 struct FontShaper {
@@ -44,7 +54,9 @@ struct FontShaper {
     Metrics loadGlyphMetrics(rune);
     ierr loadGlyphBitmap(rune);
     Bitmap renderGlyph(rune);
-    bgfx::TextureHandle renderText(std::vector<rune>);
+    TextTexture renderText(const std::vector<rune>&);
+    TextTexture renderText(const std::u32string&);
+    TextTexture renderText(const std::string&);
 };
 
 }

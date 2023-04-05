@@ -1,7 +1,5 @@
 #pragma once
 
-using double_t = double;
-
 #ifndef PLAYGROUND_SRC
     #error "Missing define(s): PLAYGROUND_SRC"
 #endif
@@ -11,8 +9,8 @@ using double_t = double;
 #include <cstdint>
 #include <cassert>
 
-#define OK (EXIT_SUCCESS);
-#define FAIL (EXIT_FAILURE);
+#define OK   EXIT_SUCCESS;
+#define FAIL EXIT_FAILURE;
 
 #define never if (0)
 #define until(...) while (!(__VA_ARGS__))

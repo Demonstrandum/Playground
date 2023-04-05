@@ -1,4 +1,14 @@
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = "b8a1527901774180afc798aeb28c4634bdccf19c4d98e7bdd1ce79d1fe9aaad7",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.4.1/bazel-skylib-1.4.1.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.4.1/bazel-skylib-1.4.1.tar.gz",
+    ],
+)
 
 # Updated as of 2023-03-27
 new_git_repository(
@@ -40,11 +50,11 @@ new_git_repository(
     build_file = "@//:bimg.BUILD",
 )
 
-# Updated as of 2023-03-18
+# Updated as of 2023-04-04
 new_git_repository(
     name = "bgfx",
     remote = "https://github.com/bkaradzic/bgfx.git",
-    commit = "b0bb4fc578cf1e9e6f446ee0c718a2305846b207",
+    commit = "c3e30539357c9c63976da1dfdadf89bdd2df0580",
     patch_args = ["-p1"],
     patches = ["@//:bgfx-egl-support.patch"],
     build_file = "@//:bgfx.BUILD",

@@ -40,5 +40,6 @@ def wayland_generate_protocols(name, protocols, **kwargs):
         hdrs = outs,
         include_prefix = '.',
         visibility = ['//visibility:public'],
+        **kwargs
     )
 

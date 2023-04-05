@@ -66,10 +66,12 @@ namespace native {
     u0* displayHandle()
     {
         ifast platform = glfwGetPlatform();
+#ifdef KERNEL_LINUX
         if (platform == GLFW_PLATFORM_X11)
             return glfwGetX11Display();
         if (platform == GLFW_PLATFORM_WAYLAND)
             return glfwGetWaylandDisplay();
+#endif
         return nullptr;
     }
 }

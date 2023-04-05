@@ -1,15 +1,21 @@
 #include <playground/common.h>
 #include <playground/native.h>
+#include <playground/mesh.h>
 #include <playground/text.h>
 
 #include "assets/inter.ttf.h"
+#include "assets/vs_texture.bin.h"
+#include "assets/fs_texture.bin.h"
 
 #include <imgui/imgui.h>
 
 #include <playground/theme.inl>
 #include <playground/imguikey.inl>
 
+#include <bx/math.h>
 #include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
+
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -26,6 +32,12 @@ const u32 RESETS = BGFX_RESET_VSYNC
     | BGFX_RESET_HIDPI
     | BGFX_RESET_HDR10;
 
+static const bgfx::EmbeddedShader embeddedShaders[] = {
+    BGFX_EMBEDDED_SHADER(vs_texture),
+    BGFX_EMBEDDED_SHADER(fs_texture),
+    BGFX_EMBEDDED_SHADER_END()
+};
+
 const ImGuiWindowFlags IMGUI_WINFLAGS = ImGuiWindowFlags_AlwaysAutoResize;
 
 struct WindowState {
@@ -37,6 +49,7 @@ struct WindowState {
     } mouse = { 0 };
     u32 width = 0, height = 0;
     u32 frameWidth = 0, frameHeight = 0;
+    f64 aspect = 1;
     f64 scale = 1;
 
     bool shouldClose() { return glfwWindowShouldClose(window); }
@@ -54,6 +67,7 @@ struct WindowState {
         width = w; height = h;
         frameWidth = fw; frameHeight = fh;
         scale = frameWidth / width;
+        aspect = frameWidth / frameHeight;
     }
     u0 registerCallbacks()
     {
@@ -118,24 +132,58 @@ static u0 frameLoop(WindowState& state)
     /* render some text */
     std::vector<umin> font(inter_ttf, std::end(inter_ttf));
     text::FontShaper shaper;
-    assert(shaper.m_lib != nullptr);
-    shaper.loadFontFace(font, 36);
-    const rune c_text[] = { 'h', 'i', ' ', 'y', 'o', 'u', '.', 0 };
-    std::vector<rune> text_line(c_text, std::end(c_text));
-    auto tex = shaper.renderText(text_line);
+    shaper.loadFontFace(font, 136);
+    auto texture = shaper.renderText("You are running Vulkan.");
 
+    /* create shader program */
+    bgfx::RendererType::Enum type = bgfx::getRendererType();
+    auto program = bgfx::createProgram(
+        bgfx::createEmbeddedShader(embeddedShaders, type, "vs_texture"),
+        bgfx::createEmbeddedShader(embeddedShaders, type, "fs_texture"),
+        true);
+
+    /* mesh test */
+    mesh::Mesh q = mesh::quad(vec2(0.0f, 0.0f), texture.rectWidth, texture.rectHeight);
+    q.vertices[0].color = mesh::RGBA32(0xff, 0x00, 0x00);
+    q.vertices[1].color = mesh::RGBA32(0x00, 0xff, 0x00);
+    q.vertices[2].color = mesh::RGBA32(0x00, 0x00, 0xff);
+    q.vertices[3].color = mesh::RGBA32(0x00, 0x00, 0x00);
+    mesh::Vertex::init();
+    bgfx::VertexBufferHandle vbh = bgfx::createVertexBuffer(q.vertexBuffer(), mesh::Vertex::layout);
+    bgfx::IndexBufferHandle ibh = bgfx::createIndexBuffer(q.indexBuffer());
+    auto s_texture = bgfx::createUniform("s_texture", bgfx::UniformType::Sampler);
+
+    /* main loop */
+    f32 view[16];
+    f32 proj[16];
     u32 frame = 0;
     until (state.shouldClose()) {
         state.tick();
-        never {
-            const u32 r = (u32)(rgba[0] * 255.0f);
-            const u32 g = (u32)(rgba[1] * 255.0f);
-            const u32 b = (u32)(rgba[2] * 255.0f);
-            const u32 a = (u32)(rgba[3] * 255.0f);
-            const u32 clearColor = (r << 24) | (g << 16) | (b << 8) | a;
-            bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, clearColor, 1.0f, 0);
-        }
-        /* drawing */
+        /* camera */
+        const bx::Vec3 at = { 0.0f, 0.0f,  0.0f };
+        const bx::Vec3 eye = { 0.0f, 0.0f, -1.0f };
+        bx::mtxLookAt(view, eye, at);
+        //bx::mtxProj(proj, 60.0f, state.aspect, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+        bx::mtxOrtho(proj,
+            0.0f, state.frameWidth,
+            0.0f, state.frameHeight,
+            0.0f, 100.0f, 0.0f,
+            bgfx::getCaps()->homogeneousDepth);
+        bgfx::setViewTransform(0, view, proj);
+        bgfx::setViewRect(0, 0, 0, state.frameWidth, state.frameHeight);
+
+        bgfx::setState(0
+            | BGFX_STATE_WRITE_RGB
+            | BGFX_STATE_WRITE_A
+            | BGFX_STATE_MSAA
+            | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+            );
+        bgfx::setTexture(0, s_texture, texture.handle);
+        bgfx::setVertexBuffer(0, vbh);
+        bgfx::setIndexBuffer(ibh);
+        bgfx::submit(0, program);
+
+        /* imgui */
         imguiBeginFrame((i32)state.mouse.x, (i32)state.mouse.y,
             state.mouse.button, (i32)state.mouse.scroll.dy,
             state.frameWidth, state.frameHeight);
@@ -168,6 +216,12 @@ static u0 frameLoop(WindowState& state)
         ++frame;
         state.tock();
     }
+
+    bgfx::destroy(program);
+    bgfx::destroy(s_texture);
+    bgfx::destroy(texture.handle);
+    bgfx::destroy(vbh);
+    bgfx::destroy(ibh);
 }
 
 ierr main(i32 argc, char** argv)
@@ -196,7 +250,7 @@ ierr main(i32 argc, char** argv)
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow *window = glfwCreateWindow(
         win_w, win_h,
-        "BGFX Window",
+        "Playground Example",
         nullptr, nullptr
     );
     if (window == nullptr) {
@@ -213,7 +267,7 @@ ierr main(i32 argc, char** argv)
     assert(pd.nwh != nullptr);
 
     bgfx::Init init;
-    init.type = bgfx::RendererType::OpenGLES;
+    init.type = bgfx::RendererType::Count;
     init.resolution.width = state.frameWidth;
     init.resolution.height = state.frameHeight;
     init.resolution.reset = RESETS;
@@ -239,6 +293,7 @@ ierr main(i32 argc, char** argv)
     /* run main loop */
     frameLoop(state);
 
+    /* clean-up */
     imguiDestroy();
     bgfx::shutdown();
     glfwDestroyWindow(window);
