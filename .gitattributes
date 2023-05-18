@@ -1,0 +1,9 @@
+# C++
+*.h   linguist-language=C++
+*.cpp linguist-language=C++
+# Starlark
+*.bzl     linguist-language=Starlark
+*.BUILD   linguist-language=Starlark
+BUILD     linguist-language=Starlark
+WORKSPACE linguist-language=Starlark
+
